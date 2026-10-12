@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BuildLock — Client App Journey Video Demo</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    body { background-color: #0F172A; color: #FFFFFF; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; padding: 20px; }
+    .video-container { width: 100%; max-width: 900px; background: #1E293B; border-radius: 24px; border: 2px solid #FF6B00; box-shadow: 0 20px 40px rgba(0,0,0,0.5); overflow: hidden; display: flex; flex-direction: column; }
+    .video-header { background: #0F172A; padding: 16px 24px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #334155; }
+    .brand-title { font-size: 20px; font-weight: 900; color: #FF6B00; display: flex; align-items: center; gap: 8px; }
+    .badge { background: rgba(255, 107, 0, 0.2); color: #FF6B00; font-size: 11px; font-weight: 800; padding: 4px 10px; border-radius: 20px; }
+    .screen-stage { display: flex; height: 500px; background: #F8FAFC; position: relative; color: #0F172A; overflow: hidden; }
+    .phone-frame { width: 340px; margin: auto; height: 92%; background: #FFFFFF; border-radius: 36px; border: 8px solid #0F172A; box-shadow: 0 10px 25px rgba(0,0,0,0.15); display: flex; flex-direction: column; padding: 16px; overflow-y: auto; transition: all 0.4s ease; }
+    .scene-description-panel { flex: 1; padding: 32px; background: #0F172A; color: #FFFFFF; display: flex; flex-direction: column; justify-content: center; border-left: 1px solid #334155; }
+    .scene-title { font-size: 22px; font-weight: 900; color: #FF6B00; margin-bottom: 12px; }
+    .voiceover-box { background: rgba(255, 255, 255, 0.05); border-left: 4px solid #FF6B00; padding: 16px; border-radius: 0 12px 12px 0; margin-bottom: 20px; font-size: 15px; line-height: 1.6; color: #E2E8F0; font-style: italic; }
+    .controls-bar { background: #0F172A; padding: 16px 24px; display: flex; align-items: center; justify-content: space-between; border-top: 1px solid #334155; }
+    .btn { background: #FF6B00; color: #FFFFFF; border: none; padding: 10px 20px; border-radius: 12px; font-weight: 800; cursor: pointer; font-size: 14px; transition: opacity 0.2s; display: inline-flex; align-items: center; gap: 8px; }
+    .btn:hover { opacity: 0.9; }
+    .btn-outline { background: transparent; border: 1.5px solid #475569; color: #FFFFFF; }
+    .progress-bar { height: 4px; background: #334155; width: 100%; }
+    .progress-fill { height: 100%; background: #FF6B00; width: 0%; transition: width 0.3s linear; }
+    .card { background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 16px; padding: 14px; margin-bottom: 10px; }
+    .card-title { font-size: 15px; font-weight: 900; color: #0F172A; }
+    .card-sub { font-size: 12px; color: #64748B; margin-top: 2px; }
+    .price { font-size: 20px; font-weight: 900; color: #0F172A; margin-top: 6px; }
+    .green-badge { color: #16A34A; background: #ECFDF5; padding: 3px 8px; border-radius: 12px; font-size: 10px; font-weight: 800; display: inline-block; }
+  </style>
+</head>
+<body>
+
+  <div class="video-container">
+    <div class="video-header">
+      <div class="brand-title">
+        <span>🏗️ BuildLock</span>
+        <span class="badge">CLIENT APP JOURNEY VIDEO DEMO</span>
+      </div>
+      <div id="scene-counter" style="font-size: 13px; font-weight: 800; color: #94A3B8;">Scene 1 of 11</div>
+    </div>
+
+    <div class="progress-bar">
+      <div class="progress-fill" id="progress"></div>
+    </div>
+
+    <div class="screen-stage">
+      <div class="phone-frame" id="phone-screen">
+        <!-- Rendered UI dynamically updated per scene -->
+      </div>
+
+      <div class="scene-description-panel">
+        <div class="scene-title" id="scene-title">1. Splash & Brand Vision</div>
+        <div class="voiceover-box" id="voiceover-text">
+          "In construction, every minute delayed costs real money. Welcome to BuildLock — India's premier B2B marketplace that ensures your job site never stops due to material shortages."
+        </div>
+        <div style="display: flex; gap: 10px;">
+          <button class="btn" onclick="speakCurrentVoiceover()">🎙️ Play English Voiceover</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="controls-bar">
+      <button class="btn btn-outline" onclick="prevScene()">◀ Previous</button>
+      <button class="btn" id="play-btn" onclick="togglePlay()">⏸ Pause Video</button>
+      <button class="btn btn-outline" onclick="nextScene()">Next Scene ▶</button>
+    </div>
+  </div>
+
+  <script>
+    const scenes = [
+      {
+        title: "1. Splash & Brand Vision",
+        voiceover: "In construction, every minute delayed costs real money. Welcome to BuildLock — India's premier B2B marketplace that ensures your job site never stops due to material shortages.",
+        html: `
+          <div style="background:#0F172A; height:100%; border-radius:24px; display:flex; flex-direction:column; align-items:center; justify-content:center; color:white; text-align:center; padding:20px;">
+            <div style="background:#FF6B00; width:70px; height:70px; border-radius:20px; display:flex; align-items:center; justify-content:center; font-size:36px; margin-bottom:16px;">🏗️</div>
+            <h1 style="font-size:32px; font-weight:900;">BuildLock</h1>
+            <p style="font-size:12px; opacity:0.8; margin-top:4px;">Construction Materials On Demand</p>
+            <p style="font-size:14px; color:#FF6B00; margin-top:16px; font-weight:800;">Material नाही? काम थांबवू नका.</p>
+          </div>
+        `
+      },
+      {
+        title: "2. Welcome & Role Selection",
+        voiceover: "Whether you are a Site Contractor looking for ready stock or a Verified Material Supplier expanding your local reach, BuildLock seamlessly connects both worlds in real-time.",
+        html: `
+          <h2 style="font-size:18px; font-weight:900; margin-bottom:12px;">Who are you?</h2>
+          <div class="card" style="border:2px solid #FF6B00; background:#FFF0E5;">
+            <div class="card-title">👷 Contractor</div>
+            <div class="card-sub">I need materials for my project sites</div>
+          </div>
+          <div class="card">
+            <div class="card-title">🏪 Supplier</div>
+            <div class="card-sub">I supply construction materials nearby</div>
+          </div>
+        `
+      },
+      {
+        title: "3. Contractor Home Dashboard",
+        voiceover: "Meet Rohan, a site contractor in Pune. From his home dashboard, Rohan can manage multiple active project sites, check site inventory pulse, or initiate rapid procurement in seconds.",
+        html: `
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+            <div>
+              <div style="font-size:11px; color:#64748B;">Good Morning,</div>
+              <div style="font-size:18px; font-weight:900;">Rohan Patil 👋</div>
+            </div>
+            <div style="background:#FFF0E5; padding:6px; border-radius:50%; color:#FF6B00; font-weight:800;">👤</div>
+          </div>
+          <div style="font-size:12px; font-weight:800; color:#FF6B00; margin-bottom:12px;">📍 Moshi Project Site • Pune</div>
+          <div class="card" style="background:#FFF4ED; border:1.5px solid #FF6B00;">
+            <span class="green-badge" style="background:#EF4444; color:white;">🚨 URGENT</span>
+            <div class="card-title" style="margin-top:6px;">M-Sand • 20 Ton</div>
+            <div class="card-sub">6 suppliers nearby with ready stock</div>
+            <button class="btn" style="margin-top:10px; width:100%; font-size:12px; padding:8px;">View Quotes</button>
+          </div>
+        `
+      },
+      {
+        title: "4. Material Specification",
+        voiceover: "Rohan selects Manufactured Sand, inputs 20 Tons, selects Standard Grade, and specifies his required 3-to-5 PM delivery slot today.",
+        html: `
+          <h2 style="font-size:18px; font-weight:900; margin-bottom:12px;">M-Sand Specification</h2>
+          <div class="card" style="background:#0F172A; color:white; text-align:center; padding:20px;">
+            <div style="font-size:36px;">🏔️</div>
+            <div style="font-size:18px; font-weight:900; margin-top:4px;">M-Sand</div>
+          </div>
+          <div class="card">Quantity: <b>20 Ton</b></div>
+          <div class="card">Quality: <b>Standard Grade</b></div>
+          <div class="card">Delivery: <b>Today 3–5 PM</b></div>
+          <button class="btn" style="width:100%; margin-top:8px;">Search Suppliers</button>
+        `
+      },
+      {
+        title: "5. Supplier List & Pin Map",
+        voiceover: "Instantly, BuildLock scans all verified stock yards within a 10-kilometer radius. Rohan can toggle between a clear price list and an interactive pin map showing distance, ratings, and live ready stock.",
+        html: `
+          <h2 style="font-size:16px; font-weight:900; margin-bottom:8px;">18 Suppliers Available</h2>
+          <div class="card" style="border:2px solid #16A34A;">
+            <span class="green-badge">✓ VERIFIED</span>
+            <div class="card-title" style="margin-top:4px;">Shree Sai Materials</div>
+            <div class="card-sub">⭐ 4.7 (128) • 2.1 km</div>
+            <div class="price">₹2,350 / Ton</div>
+            <button class="btn" style="width:100%; margin-top:8px; padding:8px;">Request Quote</button>
+          </div>
+        `
+      },
+      {
+        title: "6. Counter-Quotes & Negotiation",
+        voiceover: "Nearby suppliers submit competitive, negotiable counter-quotes. Rohan reviews the final price breakdown — including base material, transport, and 18% GST.",
+        html: `
+          <h2 style="font-size:16px; font-weight:900; margin-bottom:8px;">Supplier Counter-Quotes</h2>
+          <div class="card" style="background:#FFF0E5; border:1.5px solid #FF6B00;">
+            <span class="green-badge" style="background:#FF6B00; color:white;">BEST VALUE</span>
+            <div class="card-title" style="margin-top:4px;">Shree Sai Materials</div>
+            <div class="card-sub">20 Ton • Today 3–5 PM</div>
+            <div class="price">₹57,230 Total</div>
+            <button class="btn" style="width:100%; margin-top:8px;">Lock This Order</button>
+          </div>
+        `
+      },
+      {
+        title: "7. Digital Agreement & Signature",
+        voiceover: "Before payment, BuildLock secures digital consent. Rohan accepts non-cancellation terms and signs directly on the touch screen, locking the price and supplier commitment.",
+        html: `
+          <h2 style="font-size:16px; font-weight:900; margin-bottom:8px;">Digital Agreement</h2>
+          <div class="card">
+            <p style="font-size:12px; font-weight:800;">✓ I agree to price, quantity & delivery</p>
+            <p style="font-size:12px; font-weight:800; margin-top:4px;">✓ I accept dispute policy</p>
+          </div>
+          <div style="border:2px dashed #94A3B8; border-radius:12px; height:80px; display:flex; align-items:center; justify-content:center; color:#94A3B8; font-weight:800; font-size:12px; margin-bottom:12px;">
+            [ DRAW SIGNATURE HERE ]
+          </div>
+          <button class="btn" style="width:100%;">Continue</button>
+        `
+      },
+      {
+        title: "8. Protected Escrow Payment",
+        voiceover: "Payment is deposited into BuildLock Protected Escrow. Funds remain safely locked until material is delivered and verified at site via a unique 4-digit Delivery OTP.",
+        html: `
+          <h2 style="font-size:16px; font-weight:900; margin-bottom:8px;">Order Payment</h2>
+          <div style="text-align:center; font-size:28px; font-weight:900; color:#0F172A; margin:10px 0;">₹57,230</div>
+          <div class="card" style="background:#ECFDF5; border:1px solid #16A34A; color:#16A34A; font-size:11px; font-weight:800;">
+            🛡 Protected Transaction. Funds held safely in Escrow.
+          </div>
+          <button class="btn" style="width:100%; margin-top:12px;">Pay & Lock Order</button>
+        `
+      },
+      {
+        title: "9. Location & Delivery OTP Lock",
+        voiceover: "Site GPS location is verified and a unique Delivery OTP 4829 is generated to share with the driver upon arrival.",
+        html: `
+          <div style="text-align:center;">
+            <div style="font-size:48px;">🔐</div>
+            <h2 style="font-size:18px; font-weight:900; color:#16A34A;">ORDER LOCKED & CONFIRMED</h2>
+            <div class="card" style="background:#0F172A; color:white; margin-top:12px;">
+              <div style="font-size:11px; color:#94A3B8;">DELIVERY OTP CODE</div>
+              <div style="font-size:28px; font-weight:900; color:#FF6B00; letter-spacing:6px; margin:4px 0;">4 8 2 9</div>
+            </div>
+            <button class="btn" style="width:100%; margin-top:10px;">Track Delivery</button>
+          </div>
+        `
+      },
+      {
+        title: "10. Supplier Dispatch & Live Tracking",
+        voiceover: "At the yard, the supplier loads the vehicle and assigns driver Rajesh Kumar. Instantly, both contractor and supplier track the truck in real time on the live map.",
+        html: `
+          <h2 style="font-size:16px; font-weight:900;">Live Map Tracking</h2>
+          <div style="background:#D4E8DC; height:120px; border-radius:16px; display:flex; align-items:center; justify-content:center; font-size:40px; margin:10px 0;">
+            🚚
+          </div>
+          <div class="card">
+            <div class="card-title">Driver Rajesh Kumar</div>
+            <div class="card-sub">MH12AB1234 • ETA 32 minutes</div>
+          </div>
+          <button class="btn" style="width:100%;">Verify Delivery at Site</button>
+        `
+      },
+      {
+        title: "11. Site Verification & Auto Settlement",
+        voiceover: "Upon arrival, Rohan verifies quantity, enters delivery OTP 4829, and confirms Proof of Delivery. Escrow funds are automatically released to the supplier, and tax invoices are generated instantly.",
+        html: `
+          <div style="text-align:center; padding:10px 0;">
+            <div style="font-size:52px; color:#16A34A;">✓</div>
+            <h2 style="font-size:20px; font-weight:900; color:#0F172A;">COMPLETED & SETTLED</h2>
+            <p style="font-size:12px; color:#64748B; margin:4px 0 12px 0;">₹57,230 Released to Supplier</p>
+            <button class="btn" style="width:100%;">Rate Supplier Experience</button>
+          </div>
+        `
+      }
+    ];
+
+    let currentScene = 0;
+    let isPlaying = true;
+    let sceneTimer = null;
+
+    function renderScene() {
+      const scene = scenes[currentScene];
+      document.getElementById('scene-title').innerText = scene.title;
+      document.getElementById('voiceover-text').innerText = `"${scene.voiceover}"`;
+      document.getElementById('scene-counter').innerText = `Scene ${currentScene + 1} of ${scenes.length}`;
+      document.getElementById('phone-screen').innerHTML = scene.html;
+      document.getElementById('progress').style.width = `${((currentScene + 1) / scenes.length) * 100}%`;
+    }
+
+    function speakCurrentVoiceover() {
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(scenes[currentScene].voiceover);
+        utterance.lang = 'en-US';
+        utterance.rate = 0.95;
+        window.speechSynthesis.speak(utterance);
+      }
+    }
+
+    function togglePlay() {
+      isPlaying = !isPlaying;
+      document.getElementById('play-btn').innerText = isPlaying ? '⏸ Pause Video' : '▶ Play Video';
+      if (isPlaying) {
+        startTimer();
+      } else {
+        clearInterval(sceneTimer);
+      }
+    }
+
+    function nextScene() {
+      currentScene = (currentScene + 1) % scenes.length;
+      renderScene();
+      speakCurrentVoiceover();
+    }
+
+    function prevScene() {
+      currentScene = (currentScene - 1 + scenes.length) % scenes.length;
+      renderScene();
+      speakCurrentVoiceover();
+    }
+
+    function startTimer() {
+      clearInterval(sceneTimer);
+      sceneTimer = setInterval(() => {
+        if (isPlaying) {
+          nextScene();
+        }
+      }, 9000);
+    }
+
+    // Initialize
+    renderScene();
+    startTimer();
+  </script>
+</body>
+</html>
